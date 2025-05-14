@@ -1,2 +1,7 @@
 .idea/
 .venv/
+.cache/
+
+*.txt
+
+!requirements.txt
