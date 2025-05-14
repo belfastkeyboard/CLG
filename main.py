@@ -193,9 +193,11 @@ def print_translations(translations: list[Entry], **kwargs) -> None:
         print()
 
 
-if __name__ == '__main__':
+def main() -> None:
     args: dict = parse_args()
-
     query = args.pop('query')
-
     print_translations(get_translation(query), **args)
+
+
+if __name__ == '__main__':
+    main()
