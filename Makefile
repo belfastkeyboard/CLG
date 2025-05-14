@@ -2,7 +2,7 @@
 .ONESHELL:
 .DEFAULT_GOAL := run
 
-VENV_NAME := chat_stream_venv
+VENV_NAME := gaeilge_venv
 VENV_PATH := $(CURDIR)/$(VENV_NAME)
 
 # Check if the virtual environment already exists
