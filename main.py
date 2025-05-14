@@ -60,8 +60,8 @@ def parse_args() -> dict:
     )
 
     parser.add_argument(dest='word',
-                        type=str,
-                        help='Word to translate')
+                        help='String to translate',
+                        nargs='+')
 
     return vars(parser.parse_args())
 
@@ -126,8 +126,10 @@ def parse_focloir_response(word: str, entry: Tag) -> list[Entry]:
     return translations
 
 
-def get_from_focloir(word: str) -> list[Entry]:
-    url: str = f'https://www.focloir.ie/en/dictionary/ei/{word}'
+def get_from_focloir(word: list[str]) -> list[Entry]:
+    query: str = '+'.join(word)
+
+    url: str = f'https://www.focloir.ie/en/dictionary/ei/{query}'
 
     response: Response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 '
                                                                   '(Windows NT 10.0; Win64; x64) '
@@ -141,14 +143,17 @@ def get_from_focloir(word: str) -> list[Entry]:
     soup = BeautifulSoup(response.content, 'html.parser')
     entry: Tag = soup.find('div', class_='entry')
 
-    return parse_focloir_response(word, entry)
+    return parse_focloir_response(query, entry) if entry else []
 
 
-def get_translation(word: str) -> list[Entry]:
+def get_translation(word: list[str]) -> list[Entry]:
     return get_from_focloir(word)
 
 
 def print_translations(translations: list[Entry]) -> None:
+    if not translations:
+        return
+
     init(autoreset=True)
 
     cat_width: int = max(list(map(lambda s: len(s.grammar.category), translations)))
