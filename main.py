@@ -59,9 +59,14 @@ def parse_args() -> dict:
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument(dest='word',
-                        help='String to translate',
+    parser.add_argument(dest='query',
+                        help='Word or phrase to translate',
                         nargs='+')
+
+    parser.add_argument('-l',
+                        '--limit',
+                        help='Limit number of results to return',
+                        type=int)
 
     return vars(parser.parse_args())
 
@@ -150,7 +155,7 @@ def get_translation(word: list[str]) -> list[Entry]:
     return get_from_focloir(word)
 
 
-def print_translations(translations: list[Entry]) -> None:
+def print_translations(translations: list[Entry], **kwargs) -> None:
     if not translations:
         return
 
@@ -160,7 +165,12 @@ def print_translations(translations: list[Entry]) -> None:
     dom_width: int = max(list(map(lambda s: len(s.grammar.domain), translations)))
     num_width: int = len(str(len(translations) + 1))
 
+    limit: int = kwargs.get('limit')
+
     for i, translation in enumerate(translations):
+        if limit and i >= limit:
+            break
+
         grammar: Grammar = translation.grammar
 
         meta: str = ' '.join([f'{i + 1: <{num_width}}',
@@ -186,4 +196,6 @@ def print_translations(translations: list[Entry]) -> None:
 if __name__ == '__main__':
     args: dict = parse_args()
 
-    print_translations(get_translation(args['word']))
+    query = args.pop('query')
+
+    print_translations(get_translation(query), **args)
