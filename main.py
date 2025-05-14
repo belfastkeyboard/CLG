@@ -68,6 +68,11 @@ def parse_args() -> dict:
                         help='Limit number of results to return',
                         type=int)
 
+    parser.add_argument('-e',
+                        '--examples',
+                        help='Set flag to disable examples',
+                        action='store_true')
+
     return vars(parser.parse_args())
 
 
@@ -161,16 +166,17 @@ def print_translations(translations: list[Entry], **kwargs) -> None:
 
     init(autoreset=True)
 
+    limit: int = kwargs.get('limit')
+    examples: bool = False if kwargs.get('examples') else True
+
+    if limit:
+        translations = translations[:limit]
+
     cat_width: int = max(list(map(lambda s: len(s.grammar.category), translations)))
     dom_width: int = max(list(map(lambda s: len(s.grammar.domain), translations)))
     num_width: int = len(str(len(translations) + 1))
 
-    limit: int = kwargs.get('limit')
-
     for i, translation in enumerate(translations):
-        if limit and i >= limit:
-            break
-
         grammar: Grammar = translation.grammar
 
         meta: str = ' '.join([f'{i + 1: <{num_width}}',
@@ -186,9 +192,10 @@ def print_translations(translations: list[Entry], **kwargs) -> None:
             print(Style.DIM + trans.category, end=' ')
             print(Style.BRIGHT + trans.grammar)
 
-        for exam in translation.examples:
-            print(Style.BRIGHT + f'\t{exam.original}', end=' ')
-            print(exam.translations)
+        if examples:
+            for exam in translation.examples:
+                print(Style.BRIGHT + f'\t{exam.original}', end=' ')
+                print(exam.translations)
 
         print()
 
