@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 def parse_args() -> dict:
     parser = argparse.ArgumentParser(
-        description='Gaeilge, a command line tool for Irish language translation.\n',
+        description='Command Line Gaeilge, a tool for Irish language translation.\n',
         epilog='Example: python main.py hello',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
