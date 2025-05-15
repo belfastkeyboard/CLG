@@ -1,7 +1,5 @@
 from bs4 import BeautifulSoup, ResultSet, Tag
 from entry import Entry, Example, Grammar, Translation
-import requests
-from requests import Response
 
 
 def parse_focloir_translations(result: Tag) -> list[Translation]:
@@ -48,7 +46,12 @@ def parse_focloir_examples(result: Tag) -> list[Example]:
     return examples
 
 
-def parse_focloir_response(word: str, entry: Tag) -> list[Entry]:
+def get_from_focloir(word: str, soup: BeautifulSoup) -> list[Entry]:
+    entry: Tag = soup.find('div', class_='entry')
+
+    if not entry:
+        return []
+
     results: list[Tag] = list(entry.find_all('span', class_='sense'))
     results = list(filter(lambda s: s.find('span', class_='span_sensenum') and s.find('span', class_='pos'), results))
 
@@ -62,23 +65,3 @@ def parse_focloir_response(word: str, entry: Tag) -> list[Entry]:
         translations.append(Entry(word, grammar, quotes, examples))
 
     return translations
-
-
-def get_from_focloir(word: list[str]) -> list[Entry]:
-    query: str = '+'.join(word)
-
-    url: str = f'https://www.focloir.ie/en/dictionary/ei/{query}'
-
-    response: Response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 '
-                                                                  '(Windows NT 10.0; Win64; x64) '
-                                                                  'AppleWebKit/537.36 '
-                                                                  '(KHTML, like Gecko) '
-                                                                  'Chrome/91.0.4472.124 Safari/537.36'})
-
-    if response.status_code != 200:
-        response.raise_for_status()
-
-    soup = BeautifulSoup(response.content, 'html.parser')
-    entry: Tag = soup.find('div', class_='entry')
-
-    return parse_focloir_response(query, entry) if entry else []
