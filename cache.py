@@ -3,15 +3,17 @@ import os
 from entry import Entry, Example, Grammar, Translation
 import sqlite3
 
-CACHE = Path(os.path.dirname(os.path.abspath(__file__)), '.cache', 'storage.db')
+CACHE = Path(os.path.dirname(os.path.abspath(__file__)), '.cache')
 
 
-def get_from_cache(query: list[str]) -> list[Entry]:
-    CACHE.parent.mkdir(parents=True, exist_ok=True)
+def get_from_cache(query: list[str], site: str) -> list[Entry]:
+    CACHE.mkdir(parents=True, exist_ok=True)
     query = ' '.join(query)
     results: list[Entry] = []
 
-    with sqlite3.connect(CACHE) as conn:
+    database = Path(CACHE, f'{site}.db')
+
+    with sqlite3.connect(database) as conn:
         cursor = conn.cursor()
 
         cursor.execute(
@@ -140,14 +142,16 @@ def get_from_cache(query: list[str]) -> list[Entry]:
     return results
 
 
-def store_to_cache(query: list[str], entries: list[Entry]) -> None:
+def store_to_cache(query: list[str], entries: list[Entry], site: str) -> None:
     if not entries:
         return
 
-    CACHE.parent.mkdir(parents=True, exist_ok=True)
+    CACHE.mkdir(parents=True, exist_ok=True)
     query: str = ' '.join(query)
 
-    with sqlite3.connect(CACHE) as conn:
+    database = Path(CACHE, f'{site}.db')
+
+    with sqlite3.connect(database) as conn:
         cursor = conn.cursor()
 
         cursor.execute("""
