@@ -22,9 +22,12 @@ def parse_focloir_translations(result: Tag) -> list[Translation]:
 
 
 def parse_focloir_grammar(result: Tag) -> Grammar:
-    category: str = result.find('span', class_='pos').text.strip()
-    meaning: str = result.find('span', class_='EDMEANING').text.strip()
+    category: Tag = result.find('span', class_='pos')
+    meaning: Tag = result.find('span', class_='EDMEANING')
     domain = str(''.join(list(map(lambda d: d.text.strip(), result.find_all('span', class_='lbl_purple_sc_i')))))
+
+    category: str = category.text.strip() if category else ''
+    meaning: str = meaning.text.strip() if meaning else ''
 
     return Grammar(category, domain, meaning)
 
